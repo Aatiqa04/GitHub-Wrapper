@@ -56,6 +56,9 @@ export interface UserProfileResponse {
     createdAt: string;
     followers: { totalCount: number };
     following: { totalCount: number };
+    allReposForStars: {
+      nodes: { stargazerCount: number }[];
+    };
     repositories: {
       totalCount: number;
       nodes: Repository[];

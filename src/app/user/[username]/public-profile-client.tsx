@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { StatsOverview } from "@/components/dashboard/stats-overview";
 import { ContributionHeatmap } from "@/components/charts/contribution-heatmap";
 import { CommitActivityChart } from "@/components/charts/commit-activity-chart";
@@ -11,38 +12,98 @@ import { Button } from "@/components/ui/button";
 import type { DeveloperStats } from "@/lib/stats/types";
 
 function ShareButtons({ username }: { username: string }) {
-  const url = typeof window !== "undefined"
-    ? window.location.href
-    : `https://github-wrapped.vercel.app/user/${username}`;
+  const [status, setStatus] = useState<"idle" | "generating" | "done">("idle");
 
-  const text = `Check out my GitHub Wrapped! ${url}`;
+  const getOgImageUrl = () => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    return `${origin}/user/${username}/opengraph-image`;
+  };
+
+  const getProfileUrl = () => {
+    return typeof window !== "undefined"
+      ? window.location.href
+      : `https://github-wrapped.vercel.app/user/${username}`;
+  };
+
+  const handleDownloadImage = async () => {
+    setStatus("generating");
+    try {
+      const res = await fetch(getOgImageUrl());
+      const blob = await res.blob();
+      const link = document.createElement("a");
+      link.download = `github-wrapped-${username}.png`;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+      setStatus("done");
+      setTimeout(() => setStatus("idle"), 2000);
+    } catch {
+      setStatus("idle");
+    }
+  };
+
+  const handleShareImage = async () => {
+    setStatus("generating");
+    try {
+      const res = await fetch(getOgImageUrl());
+      const blob = await res.blob();
+      const file = new File([blob], `github-wrapped-${username}.png`, {
+        type: "image/png",
+      });
+
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: `${username}'s GitHub Wrapped`,
+          text: `Check out my GitHub Wrapped!`,
+          url: getProfileUrl(),
+          files: [file],
+        });
+      } else {
+        // Fallback: download image + open tweet with link
+        const link = document.createElement("a");
+        link.download = file.name;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+        window.open(
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+            `Check out my GitHub Wrapped! ${getProfileUrl()}`
+          )}`,
+          "_blank"
+        );
+      }
+      setStatus("done");
+      setTimeout(() => setStatus("idle"), 2000);
+    } catch {
+      setStatus("idle");
+    }
+  };
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-2">
       <Button
         variant="secondary"
         size="sm"
-        onClick={() => {
-          navigator.clipboard.writeText(url);
-        }}
+        onClick={handleDownloadImage}
+        disabled={status === "generating"}
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
-        Copy Link
+        {status === "generating" ? "Generating..." : status === "done" ? "Saved!" : "Download"}
       </Button>
-      <a
-        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={handleShareImage}
+        disabled={status === "generating"}
       >
-        <Button variant="secondary" size="sm">
-          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-          </svg>
-          Tweet
-        </Button>
-      </a>
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+        </svg>
+        Share
+      </Button>
     </div>
   );
 }

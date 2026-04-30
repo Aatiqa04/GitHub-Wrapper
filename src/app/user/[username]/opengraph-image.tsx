@@ -13,16 +13,11 @@ export default async function OGImage({
 }: {
   params: { username: string };
 }) {
-  const interFont = fetch(
-    new URL("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap")
-  ).then((res) => res.arrayBuffer()).catch(() => null);
-
   let stats;
   try {
     const profile = await fetchPublicUserProfile(params.username);
     stats = computeStats(profile);
   } catch {
-    // Fallback if user not found
     return new ImageResponse(
       (
         <div
@@ -45,21 +40,7 @@ export default async function OGImage({
     );
   }
 
-  const fontData = await interFont;
-
   return new ImageResponse(<StatsCardOG stats={stats} />, {
     ...size,
-    ...(fontData
-      ? {
-          fonts: [
-            {
-              name: "Inter",
-              data: fontData,
-              style: "normal",
-              weight: 400,
-            },
-          ],
-        }
-      : {}),
   });
 }

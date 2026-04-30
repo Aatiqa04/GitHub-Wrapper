@@ -23,7 +23,7 @@ export function computeStats(
   const topRepos = computeTopRepos(repositories.nodes);
   const heatmapData = computeHeatmap(calendar.weeks);
   const { longestStreak, currentStreak } = computeStreaks(calendar.weeks);
-  const totalStars = repositories.nodes.reduce(
+  const totalStars = profile.allReposForStars.nodes.reduce(
     (sum, r) => sum + r.stargazerCount,
     0
   );

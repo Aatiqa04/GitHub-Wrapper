@@ -12,24 +12,24 @@ import type { DeveloperStats } from "@/lib/stats/types";
 
 export function DashboardClient({ stats }: { stats: DeveloperStats }) {
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:py-8 sm:px-6 lg:px-8">
       {/* Profile header */}
-      <div className="flex items-center gap-6 animate-fade-in mb-8">
+      <div className="flex items-center gap-4 sm:gap-6 animate-fade-in mb-6 sm:mb-8">
         <Avatar src={stats.avatarUrl} alt={stats.username} size="lg" />
-        <div>
-          <h1 className="text-3xl font-bold text-white">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white truncate">
             {stats.name || stats.username}&apos;s Wrapped
           </h1>
-          <p className="text-gh-muted">
+          <p className="text-sm text-gh-muted">
             @{stats.username} &middot; {stats.totalRepos} repos &middot;{" "}
             {stats.followers} followers
           </p>
         </div>
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex flex-col xl:flex-row gap-8">
         {/* Main content */}
-        <div className="flex-1 min-w-0 space-y-8">
+        <div className="flex-1 min-w-0 space-y-6 sm:space-y-8">
           <StatsOverview stats={stats} />
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -48,9 +48,9 @@ export function DashboardClient({ stats }: { stats: DeveloperStats }) {
           />
         </div>
 
-        {/* Sticky stats card — right side */}
-        <div className="hidden xl:block w-80 shrink-0">
-          <div className="sticky top-24">
+        {/* Stats card — sticky sidebar on xl, inline section on smaller screens */}
+        <div className="xl:w-[28rem] xl:shrink-0">
+          <div className="xl:sticky xl:top-24">
             <h2 className="text-lg font-semibold text-white mb-4">
               Share Your Stats
             </h2>

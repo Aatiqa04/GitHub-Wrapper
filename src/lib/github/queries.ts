@@ -12,6 +12,11 @@ export const USER_PROFILE_QUERY = `
       following { totalCount }
       starredRepositories { totalCount }
       pullRequests(states: [OPEN, CLOSED, MERGED]) { totalCount }
+      allReposForStars: repositories(first: 100, ownerAffiliations: [OWNER], orderBy: { field: STARGAZERS, direction: DESC }) {
+        nodes {
+          stargazerCount
+        }
+      }
       repositories(first: 100, ownerAffiliations: [OWNER, COLLABORATOR], orderBy: { field: PUSHED_AT, direction: DESC }) {
         totalCount
         nodes {
@@ -81,7 +86,12 @@ export const PUBLIC_USER_PROFILE_QUERY = `
       following { totalCount }
       starredRepositories { totalCount }
       pullRequests(states: [OPEN, CLOSED, MERGED]) { totalCount }
-      repositories(first: 100, ownerAffiliations: [OWNER], orderBy: { field: PUSHED_AT, direction: DESC }, privacy: PUBLIC) {
+      allReposForStars: repositories(first: 100, ownerAffiliations: [OWNER], orderBy: { field: STARGAZERS, direction: DESC }) {
+        nodes {
+          stargazerCount
+        }
+      }
+      repositories(first: 100, ownerAffiliations: [OWNER, COLLABORATOR], orderBy: { field: PUSHED_AT, direction: DESC }) {
         totalCount
         nodes {
           name
