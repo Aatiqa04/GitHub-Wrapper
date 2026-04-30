@@ -12,15 +12,32 @@ export function StatsCard({ stats }: { stats: DeveloperStats }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
 
+  const captureCard = async () => {
+    if (!cardRef.current) return null;
+    const original = cardRef.current;
+    const clone = original.cloneNode(true) as HTMLElement;
+    clone.style.width = `${original.offsetWidth}px`;
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText =
+      "position:absolute;top:0;left:-9999px;overflow:visible;";
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+    await new Promise((r) => requestAnimationFrame(r));
+    const canvas = await html2canvas(clone, {
+      backgroundColor: "#0d1117",
+      scale: 2,
+      useCORS: true,
+    });
+    document.body.removeChild(wrapper);
+    return canvas;
+  };
+
   const handleDownload = async () => {
     if (!cardRef.current) return;
     setDownloading(true);
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: "#0d1117",
-        scale: 2,
-        useCORS: true,
-      });
+      const canvas = await captureCard();
+      if (!canvas) return;
       const link = document.createElement("a");
       link.download = `github-wrapped-${stats.username}.png`;
       link.href = canvas.toDataURL("image/png");
@@ -33,11 +50,8 @@ export function StatsCard({ stats }: { stats: DeveloperStats }) {
   const handleShare = async () => {
     if (!cardRef.current) return;
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: "#0d1117",
-        scale: 2,
-        useCORS: true,
-      });
+      const canvas = await captureCard();
+      if (!canvas) return;
       canvas.toBlob(async (blob) => {
         if (!blob) return;
         const file = new File([blob], `github-wrapped-${stats.username}.png`, {
@@ -73,21 +87,24 @@ export function StatsCard({ stats }: { stats: DeveloperStats }) {
     <div className="space-y-3 w-full">
       {/* Capturable card area */}
       <div ref={cardRef}>
-        <Card className="w-full overflow-hidden">
+        <Card className="w-full">
           {/* Header — avatar, name, bio */}
           <div className="flex items-center gap-3 sm:gap-4 mb-2">
             <Avatar src={stats.avatarUrl} alt={stats.username} size="lg" />
             <div className="min-w-0">
-              <h2 className="text-lg sm:text-xl font-bold text-white truncate">
+              <h2 className="text-lg sm:text-xl font-bold text-white">
                 {stats.name || stats.username}
               </h2>
               <p className="text-xs sm:text-sm text-gh-muted">@{stats.username}</p>
+              <p className="text-xs mt-0.5" style={{ color: stats.archetype.color }}>
+                {stats.archetype.icon} {stats.archetype.title}
+              </p>
             </div>
           </div>
 
           {/* Bio */}
           {stats.bio && (
-            <p className="text-xs text-gh-muted mb-4 line-clamp-2">{stats.bio}</p>
+            <p className="text-xs text-gh-muted mb-4">{stats.bio}</p>
           )}
 
           {/* Stats grid — 2 cols on small, 3 cols on wider */}
@@ -132,10 +149,10 @@ export function StatsCard({ stats }: { stats: DeveloperStats }) {
                 {stats.topRepos.slice(0, 3).map((repo, i) => (
                   <div
                     key={repo.nameWithOwner}
-                    className="flex items-center gap-2 rounded-md bg-gh-bg px-2 sm:px-2.5 py-1.5"
+                    className="flex items-center gap-2 rounded-md bg-gh-bg px-2 sm:px-2.5 py-2"
                   >
                     <span className="text-xs font-bold text-gh-muted w-4 shrink-0">{i + 1}</span>
-                    <span className="text-xs text-white truncate flex-1 min-w-0">{repo.name}</span>
+                    <span className="text-xs text-white flex-1 min-w-0 whitespace-nowrap overflow-visible">{repo.name}</span>
                     {repo.language && (
                       <span className="hidden sm:flex items-center gap-1 text-[10px] text-gh-muted shrink-0">
                         <span
@@ -188,7 +205,7 @@ export function StatsCard({ stats }: { stats: DeveloperStats }) {
                 {earnedBadges.map((badge) => (
                   <span
                     key={badge.id}
-                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] sm:text-xs"
+                    className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[10px] sm:text-xs"
                     style={{
                       backgroundColor: `${badge.color}15`,
                       color: badge.color,

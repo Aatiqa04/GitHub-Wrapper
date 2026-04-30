@@ -9,6 +9,7 @@ import type {
   HeatmapDay,
 } from "./types";
 import { computeBadges } from "./badges";
+import { computeArchetype } from "./archetypes";
 import { CONTRIBUTION_LEVELS, DAYS_OF_WEEK } from "@/lib/constants";
 
 export function computeStats(
@@ -57,6 +58,7 @@ export function computeStats(
     weeklyActiveCount,
     weekendPercentage,
     joinDate: profile.createdAt,
+    archetype: { id: "", title: "", description: "", icon: "", color: "" },
   };
 
   stats.badges = computeBadges(stats, {
@@ -64,6 +66,9 @@ export function computeStats(
     publicRepoCount,
     monthlyActivity,
   });
+
+  const accountAgeDays = differenceInDays(new Date(), parseISO(profile.createdAt));
+  stats.archetype = computeArchetype(stats, { publicRepoCount, accountAgeDays });
 
   return stats;
 }

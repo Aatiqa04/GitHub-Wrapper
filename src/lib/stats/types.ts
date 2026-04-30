@@ -41,6 +41,14 @@ export interface Badge {
   color: string;
 }
 
+export interface DeveloperArchetype {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+}
+
 export interface DeveloperStats {
   username: string;
   name: string | null;
@@ -65,4 +73,5 @@ export interface DeveloperStats {
   weeklyActiveCount: number;
   weekendPercentage: number;
   joinDate: string;
+  archetype: DeveloperArchetype;
 }

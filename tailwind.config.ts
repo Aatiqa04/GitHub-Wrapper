@@ -34,6 +34,9 @@ const config: Config = {
         "slide-up": "slideUp 0.5s ease-out",
         "scale-in": "scaleIn 0.3s ease-out",
         "pulse-glow": "pulseGlow 2s ease-in-out infinite",
+        "slide-in-right": "slideInRight 0.4s ease-out",
+        "slide-in-left": "slideInLeft 0.4s ease-out",
+        "bounce-in": "bounceIn 0.5s ease-out",
       },
       keyframes: {
         fadeIn: {
@@ -51,6 +54,20 @@ const config: Config = {
         pulseGlow: {
           "0%, 100%": { boxShadow: "0 0 0 0 rgba(57, 211, 83, 0)" },
           "50%": { boxShadow: "0 0 20px 4px rgba(57, 211, 83, 0.15)" },
+        },
+        slideInRight: {
+          "0%": { opacity: "0", transform: "translateX(60px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        slideInLeft: {
+          "0%": { opacity: "0", transform: "translateX(-60px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        bounceIn: {
+          "0%": { opacity: "0", transform: "scale(0.3)" },
+          "50%": { transform: "scale(1.05)" },
+          "70%": { transform: "scale(0.95)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
         },
       },
     },

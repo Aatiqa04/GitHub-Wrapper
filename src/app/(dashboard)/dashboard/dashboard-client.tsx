@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { StatsOverview } from "@/components/dashboard/stats-overview";
 import { ContributionHeatmap } from "@/components/charts/contribution-heatmap";
 import { CommitActivityChart } from "@/components/charts/commit-activity-chart";
@@ -7,10 +8,14 @@ import { LanguagePieChart } from "@/components/charts/language-pie-chart";
 import { TopReposList } from "@/components/dashboard/top-repos-list";
 import { BadgeShowcase } from "@/components/dashboard/badge-showcase";
 import { StatsCard } from "@/components/cards/stats-card";
+import { EmbedSnippet } from "@/components/dashboard/embed-snippet";
+import { WrappedCard } from "@/components/story/wrapped-card";
 import { Avatar } from "@/components/ui/avatar";
 import type { DeveloperStats } from "@/lib/stats/types";
 
 export function DashboardClient({ stats }: { stats: DeveloperStats }) {
+  const [showWrapped, setShowWrapped] = useState(false);
+
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-6 sm:py-8 sm:px-6 lg:px-8">
       {/* Profile header */}
@@ -25,6 +30,24 @@ export function DashboardClient({ stats }: { stats: DeveloperStats }) {
             {stats.followers} followers
           </p>
         </div>
+      </div>
+
+      {/* Archetype banner */}
+      <div
+        className="flex items-center gap-4 rounded-lg border bg-gh-card p-4 mb-6 sm:mb-8 animate-fade-in"
+        style={{ borderColor: stats.archetype.color }}
+      >
+        <span className="text-3xl">{stats.archetype.icon}</span>
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-white">{stats.archetype.title}</p>
+          <p className="text-xs text-gh-muted">{stats.archetype.description}</p>
+        </div>
+        <button
+          onClick={() => setShowWrapped(true)}
+          className="ml-auto shrink-0 rounded-lg bg-gh-green px-4 py-2 text-sm font-semibold text-white hover:bg-gh-green-dark transition-colors"
+        >
+          View Your Wrapped
+        </button>
       </div>
 
       <div className="flex flex-col xl:flex-row gap-8">
@@ -55,9 +78,17 @@ export function DashboardClient({ stats }: { stats: DeveloperStats }) {
               Share Your Stats
             </h2>
             <StatsCard stats={stats} />
+            <div className="mt-6">
+              <EmbedSnippet username={stats.username} />
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Wrapped modal */}
+      {showWrapped && (
+        <WrappedCard stats={stats} onClose={() => setShowWrapped(false)} />
+      )}
     </div>
   );
 }

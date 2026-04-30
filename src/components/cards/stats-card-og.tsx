@@ -36,9 +36,26 @@ export function StatsCardOG({ stats }: { stats: DeveloperStats }) {
           >
             {stats.name || stats.username}
           </span>
-          <span style={{ fontSize: "20px", color: "#8b949e" }}>
-            @{stats.username}
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span style={{ fontSize: "20px", color: "#8b949e" }}>
+              @{stats.username}
+            </span>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                backgroundColor: `${stats.archetype.color}20`,
+                borderRadius: "16px",
+                padding: "4px 12px",
+                fontSize: "16px",
+                color: stats.archetype.color,
+                border: `1px solid ${stats.archetype.color}40`,
+              }}
+            >
+              {stats.archetype.icon} {stats.archetype.title}
+            </span>
+          </div>
         </div>
         <div
           style={{

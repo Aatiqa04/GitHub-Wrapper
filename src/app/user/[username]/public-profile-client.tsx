@@ -128,6 +128,18 @@ export function PublicProfileClient({ stats }: { stats: DeveloperStats }) {
         <ShareButtons username={stats.username} />
       </div>
 
+      {/* Archetype banner */}
+      <div
+        className="flex items-center gap-4 rounded-lg border bg-gh-card p-4 animate-fade-in"
+        style={{ borderColor: stats.archetype.color }}
+      >
+        <span className="text-3xl">{stats.archetype.icon}</span>
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-white">{stats.archetype.title}</p>
+          <p className="text-xs text-gh-muted">{stats.archetype.description}</p>
+        </div>
+      </div>
+
       <StatsOverview stats={stats} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
